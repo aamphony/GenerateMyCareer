@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique @db.VarChar(255)
+  name           String?          @db.VarChar(100)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  profiles       Profile[]
+  WorkExperience WorkExperience[]
+  OtherHighlight OtherHighlight[]
+  CoverLetter    CoverLetter[]
+}
+
+model Profile {
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(50)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  workExperiences WorkExperience[]
+  OtherHighlight  OtherHighlight[]
+  User            User             @relation(fields: [userId], references: [id])
+  userId          Int
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model WorkExperience {
+  id        Int      @id @default(autoincrement())
+  jobTitle  String   @db.VarChar(50)
+  company   String   @db.VarChar(50)
+  years     Int
+  details   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Profile   Profile? @relation(fields: [profileId], references: [id])
+  profileId Int?
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@unique([userId, jobTitle, company])
+  @@index([userId])
+}
+
+model OtherHighlight {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(50)
+  details   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Profile   Profile? @relation(fields: [profileId], references: [id])
+  profileId Int?
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@unique([userId, title])
+  @@index([userId])
+}
+
+model CoverLetter {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(50)
+  details   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@unique([userId, title])
+  @@index([userId])
+}
