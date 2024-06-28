@@ -5,81 +5,89 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique @db.VarChar(255)
-  name           String?          @db.VarChar(100)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  profiles       Profile[]
-  WorkExperience WorkExperience[]
-  OtherHighlight OtherHighlight[]
-  CoverLetter    CoverLetter[]
-}
+  id                Int                @id @default(autoincrement())
+  username          String             @unique @db.VarChar(100)
+  password          String             @db.VarChar(255)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
+  workExperiences   WorkExperience[]
+  otherExperiences  OtherExperience[]
+  coverLetters      CoverLetter[]
+  experienceDetails ExperienceDetail[]
 
-model Profile {
-  id              Int              @id @default(autoincrement())
-  name            String           @db.VarChar(50)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  workExperiences WorkExperience[]
-  OtherHighlight  OtherHighlight[]
-  User            User             @relation(fields: [userId], references: [id])
-  userId          Int
-
-  @@unique([userId, name])
-  @@index([userId])
+  @@map("users")
 }
 
 model WorkExperience {
-  id        Int      @id @default(autoincrement())
-  jobTitle  String   @db.VarChar(50)
-  company   String   @db.VarChar(50)
-  years     Int
-  details   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Profile   Profile? @relation(fields: [profileId], references: [id])
-  profileId Int?
-  User      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  id                Int                @id @default(autoincrement())
+  jobTitle          String             @map("job_title") @db.VarChar(50)
+  company           String             @db.VarChar(50)
+  years             Int
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
+  user              User               @relation(fields: [userId], references: [id])
+  userId            Int
+  experienceDetails ExperienceDetail[]
 
   @@unique([userId, jobTitle, company])
   @@index([userId])
+  @@map("work_experiences")
 }
 
-model OtherHighlight {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(50)
-  details   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Profile   Profile? @relation(fields: [profileId], references: [id])
-  profileId Int?
-  User      User     @relation(fields: [userId], references: [id])
-  userId    Int
+model OtherExperience {
+  id                Int                @id @default(autoincrement())
+  title             String             @db.VarChar(50)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
+  user              User               @relation(fields: [userId], references: [id])
+  userId            Int
+  experienceDetails ExperienceDetail[]
 
   @@unique([userId, title])
   @@index([userId])
+  @@map("other_experiences")
 }
 
 model CoverLetter {
   id        Int      @id @default(autoincrement())
   title     String   @db.VarChar(50)
-  details   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id])
+  text      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int
 
   @@unique([userId, title])
   @@index([userId])
+  @@map("cover_letters")
+}
+
+model ExperienceDetail {
+  id                Int                        @id @default(autoincrement())
+  text              String                     @db.Text
+  embedding         Unsupported("vector(384)")
+  createdAt         DateTime                   @default(now()) @map("created_at")
+  updatedAt         DateTime                   @default(now()) @updatedAt @map("updated_at")
+  workExperience    WorkExperience?            @relation(fields: [workExperienceId], references: [id])
+  workExperienceId  Int?
+  otherExperience   OtherExperience?           @relation(fields: [otherExperienceId], references: [id])
+  otherExperienceId Int?
+  user              User                       @relation(fields: [userId], references: [id])
+  userId            Int
+
+  @@index([userId])
+  @@index([workExperienceId])
+  @@index([otherExperienceId])
+  @@map("experience_details")
 }
