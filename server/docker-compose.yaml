@@ -15,7 +15,5 @@ services:
     volumes:
       - ./:/usr/local/apps/server/dev
       - ignore:/usr/local/apps/server/dev/node_modules
-    depends_on:
-      - db
 volumes:
   ignore:
