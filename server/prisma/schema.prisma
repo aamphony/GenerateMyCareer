@@ -34,7 +34,10 @@ model WorkExperience {
   id                Int                @id @default(autoincrement())
   jobTitle          String             @map("job_title") @db.VarChar(50)
   company           String             @db.VarChar(50)
-  years             Int
+  startMonth        Int                @map("start_month")
+  startYear         Int                @map("start_year")
+  endMonth          Int?               @map("end_month")
+  endYear           Int?               @map("end_year")
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
   user              User               @relation(fields: [userId], references: [id])
