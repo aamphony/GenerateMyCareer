@@ -9,7 +9,10 @@ const errorHandler = async (
     console.log('in the error handler');
     console.error(err.stack);
 
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(400).json({
+        error: 'Internal Server Error',
+        message: err.message,
+    });
 };
 
 export default errorHandler;

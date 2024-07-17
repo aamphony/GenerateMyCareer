@@ -8,6 +8,7 @@ const envSchema = z.object({
     DATABASE_URL: z.string(),
     HF_API_KEY: z.string(),
     JWT_SECRET: z.string(),
+    COOKIE_SECRET: z.string(),
     SALT_ROUNDS: z.coerce.number().min(10).max(15),
     NODE_ENV: z.string().default('development'),
 });

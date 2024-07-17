@@ -29,11 +29,33 @@ export const loginUser = async (data: LoginUserParams) => {
             throw new Error('Invalid password');
         }
 
-        const token = jwt.sign({ username }, env.JWT_SECRET, {
-            expiresIn: 300,
+        const token = jwt.sign({ userId: user.id, username }, env.JWT_SECRET, {
+            expiresIn: 600,
         });
 
-        return token;
+        return { token, id: user.id, username };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getUser = async (username: string) => {
+    try {
+        const user = await db.user.findUnique({
+            where: {
+                username,
+            },
+        });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return {
+            userId: user.id,
+            username: user.username,
+        };
     } catch (error) {
         console.error(error);
         throw error;

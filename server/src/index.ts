@@ -2,14 +2,23 @@ import express from 'express';
 import authRouter from './routes/auth';
 import env from './lib/env';
 import errorHandler from './middleware/errorHandler';
-
+import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 const PORT = env.PORT;
 
 const app = express();
 
+app.use(
+    cors({
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+    })
+);
 app.use(express.json());
+app.use(cookieParser(env.COOKIE_SECRET));
 app.use('/api/auth', authRouter);
 
 // app.get('/', async (req, res) => {
@@ -38,21 +47,21 @@ app.use('/api/auth', authRouter);
 // });
 
 app.get('/protected', async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const { token } = req.cookies;
 
     if (!token) {
         return res.status(401).send('Unauthorized');
     }
 
-    console.log(token);
-
     try {
-        const decoded = jwt.verify(token, env.JWT_SECRET);
-        res.status(200).json(decoded);
+        const payload = jwt.verify(token, env.JWT_SECRET);
+        console.log(payload);
     } catch (error) {
         console.error(error);
-        next(error);
+        return res.status(401).send('Unauthorized');
     }
+
+    return res.status(200).json({ message: 'Protected route' });
 });
 
 app.use(errorHandler);
