@@ -7,8 +7,7 @@
     "dev": "ts-node -r dotenv/config src/index.ts",
     "dev:watch": "nodemon -r dotenv/config src/index.ts",
     "migrate:dev": "prisma migrate dev",
-    "migrate:resolve": "prisma migrate resolve --applied",
-    "migrate:reset": "prisma migrate reset"
+    "prisma:generate": "prisma generate"
   },
   "keywords": [],
   "author": "Alex Amphone",

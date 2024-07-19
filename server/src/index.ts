@@ -5,6 +5,7 @@ import errorHandler from './middleware/errorHandler';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
+import experienceRouter from './routes/experience';
 
 const PORT = env.PORT;
 
@@ -20,31 +21,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser(env.COOKIE_SECRET));
 app.use('/api/auth', authRouter);
-
-// app.get('/', async (req, res) => {
-//     const { text } = req.body;
-
-//     if (!text) {
-//         return res.status(400).send('Text is required');
-//     }
-
-//     // const embedding = await generateEmbedding(text);
-
-//     const embeddingToCompare = await generateEmbedding(
-//         'That is a happy person'
-//     );
-
-//     fs.writeFileSync('embedding.txt', JSON.stringify(embeddingToCompare));
-
-//     console.log(embeddingToCompare);
-
-//     // const newDetail = await db.$executeRaw`INSERT INTO experience_details
-//     //     (text, embedding, "userId")
-//     //     VALUES (${text}, ${embedding}::vector(384), 1)
-//     // `;
-
-//     return res.status(200).send('Success');
-// });
+app.use('/api/experience', experienceRouter);
 
 app.get('/protected', async (req, res, next) => {
     const { token } = req.cookies;

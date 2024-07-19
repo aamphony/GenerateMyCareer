@@ -1,9 +1,7 @@
 import { HfInference } from '@huggingface/inference';
-// import { config } from 'dotenv';
+import env from './env';
 
-// config();
-
-const hf = new HfInference(process.env.HF_API_KEY);
+const hf = new HfInference(env.HF_API_KEY);
 
 function dotProduct(a: number[], b: number[]): number {
     let result = 0;
